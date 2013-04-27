@@ -8,6 +8,10 @@ public class Task {
 		info = taskInfo;
 	}
 	
+	public int getComputed() {
+		return computed;
+	}
+	
 	public TaskInfo getInfo() {
 		return info;
 	}
