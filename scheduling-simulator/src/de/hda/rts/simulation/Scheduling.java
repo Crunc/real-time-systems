@@ -14,7 +14,7 @@ public abstract class Scheduling {
 	private final List<Task> waitingTasks;
 	private Task computingTask;
 	private int stepCount;
-	private final ScheduleModel model;
+	private ScheduleModel model;
 
 	private final String analyzation;
 
@@ -27,15 +27,19 @@ public abstract class Scheduling {
 
 		stepCount = 0;
 		waitingTasks = new ArrayList<Task>(tasks);
-		model = new ScheduleModel(toString(), tasks);
 		analyzation = analyzeStatically();
+		Collections.sort(tasks, getPriorityComparator());
+		Collections.sort(waitingTasks, getPriorityComparator());
+		model = new ScheduleModel(toString(), tasks);
 		
 	}
 
 	public boolean doNextStep(int treshhold) {
 		if (stepCount == 0) {
+			// initialization
 			Collections.sort(tasks, getPriorityComparator());
 			Collections.sort(waitingTasks, getPriorityComparator());
+			Collections.sort(model.getTasks(), getPriorityComparator());
 		}
 		
 		if (!isFinished() && getStep() < treshhold) {
@@ -80,6 +84,7 @@ public abstract class Scheduling {
 		}
 
 		Collections.sort(waitingTasks, getPriorityComparator());
+		Collections.sort(model.getTasks(), getPriorityComparator());
 		return true;
 	}
 

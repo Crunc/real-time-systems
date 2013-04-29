@@ -7,20 +7,22 @@ import java.util.List;
 import java.util.Map;
 
 public class ResponseTimeAnalysis extends Scheduling {
-	private final List<Task> rtaList;
+//	private final List<Task> rtaList;
 	
 	public ResponseTimeAnalysis(List<TaskInfo> taskInfos) {
 		super(taskInfos);
-		rtaList = sortByResponseTime(getTasks());
+//		rtaList = sortByResponseTime(getTasks());
 		
-		if (rtaList == null) {
-			System.err.println("no optimal priorities were found");
-		}
+//		if (rtaList == null) {
+//			System.err.println("no optimal priorities were found");
+//		}
 	}
 
 	@Override
 	protected Comparator<Task> getPriorityComparator() {
 		return new Comparator<Task>() {
+			private final List<Task> rtaList = sortByResponseTime(getTasks());
+			
 			@Override
 			public int compare(Task left, Task right) {
 				Integer leftRt = rtaList.indexOf(left);
