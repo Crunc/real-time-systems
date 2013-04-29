@@ -112,19 +112,21 @@ public class ScheduleChart extends JScrollPane implements Observer {
 	        
 	        for (int idx = 0; idx < steps.size(); ++idx) {
 
-	        	int val = steps.get(idx);
+	        	int taskIdx = steps.get(idx);
+	        	
 	        	int x = idx * BASE_SIZE;
 	        	
 	        	g.setColor(STEP_BACKGROUND_COLOR);
         		g.fillRect(x, 0, BASE_SIZE, model.taskCount() * BASE_SIZE);
 	        	
-	        	if (val > -1) {
+	        	if (taskIdx > -1) {
+		        	Task task = model.getTasks().get(taskIdx);
 		        	int y = steps.get(idx) * BASE_SIZE;
 		        	
-		        	final Color c = ROW_COLORS[val % ROW_COLORS.length];
+		        	final Color c = ROW_COLORS[taskIdx % ROW_COLORS.length];
 		        	
 		        	g.setColor(c);
-		        	g.fillRect(x, y, BASE_SIZE, BASE_SIZE);
+		        	g.fillRect(x + 1, y + 1, BASE_SIZE - 2, BASE_SIZE - 2);
 		        	
 		        	g.setColor(Color.black);
 		        	g.setFont(STEP_FONT);

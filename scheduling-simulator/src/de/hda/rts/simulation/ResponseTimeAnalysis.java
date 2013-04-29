@@ -6,14 +6,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import de.hda.rts.simulation.util.Tasks;
-
 public class ResponseTimeAnalysis extends Scheduling {
-	private final Map<Task, Integer> responseTimes;
+	private final List<Task> rtaList;
 	
 	public ResponseTimeAnalysis(List<TaskInfo> taskInfos) {
 		super(taskInfos);
-		responseTimes = calculateResponseTimes(getTasks());
+		rtaList = sortByResponseTime(getTasks());
+		
+		if (rtaList == null) {
+			System.err.println("no optimal priorities were found");
+		}
 	}
 
 	@Override
@@ -21,35 +23,66 @@ public class ResponseTimeAnalysis extends Scheduling {
 		return new Comparator<Task>() {
 			@Override
 			public int compare(Task left, Task right) {
-				Integer leftRt = responseTimes.get(left);
-				Integer rightRt = responseTimes.get(right);
+				Integer leftRt = rtaList.indexOf(left);
+				Integer rightRt = rtaList.indexOf(right);
 				return leftRt - rightRt;
 			}
 		};
 	}
 	
-	private Map<Task, Integer> calculateResponseTimes(List<Task> tasks) {
-		// copy the tasks to preserve their order
-		List<Task> tasksByPeriod = new ArrayList<Task>(tasks);
-		
-		// sort the copied tasks by period
-		Collections.sort(tasksByPeriod, Tasks.PERIOD_COMPARATOR);
-		
-		Map<Task, Integer> responseTimes = Tasks.newTaskMap();
-		
-		for (int idx = 0; idx < tasksByPeriod.size(); ++idx) {
-			final Task task = tasksByPeriod.get(idx);
-			final int responseTime = calculateResponseTime(idx, tasksByPeriod, responseTimes);
+//	private Map<Task, Integer> calculateResponseTimes(List<Task> tasks) {
+//		// copy the tasks to preserve their order
+//		List<Task> tasksByPeriod = new ArrayList<Task>(tasks);
+//		
+//		// sort the copied tasks by period
+//		Collections.sort(tasksByPeriod, Tasks.PERIOD_COMPARATOR);
+//		
+//		Map<Task, Integer> responseTimes = Tasks.newTaskMap();
+//		
+//		for (int idx = 0; idx < tasksByPeriod.size(); ++idx) {
+//			final Task task = tasksByPeriod.get(idx);
+//			final int responseTime = calculateResponseTime(idx, tasksByPeriod, responseTimes);
+//
+//			responseTimes.put(task, responseTime);
+//		}
+//		
+//		print(responseTimes);
+//		return responseTimes;
+//	}
+	
+	private List<Task> sortByResponseTime(List<Task> tasks) {
+		List<Task> set = new ArrayList<Task>(tasks);
 
-			responseTimes.put(task, responseTime);
+		boolean ok = true;
+		for (int k = set.size() - 1; ok && k >= 0; --k) {
+			
+			int rta = Integer.MAX_VALUE;
+			
+			for (int next = k; ok && next >= 0; --next) {
+				if (next > k) {
+					Collections.swap(set, k, next);
+				}
+				
+				rta = calculateResponseTime(k, set);				
+				
+				if (rta > set.get(k).getInfo().getDeadline()) {
+					ok = false;
+				}
+			}
+
+			System.out.printf("[%d] %s: %d\n", k, set.get(k), rta);
 		}
 		
-		print(responseTimes);
-		return responseTimes;
+		if (ok) {
+			return set;
+		}
+		else {
+			return null;
+		}
 	}
 	
-	private int calculateResponseTime(int taskIdx, List<Task> tasksByPeriod, Map<Task, Integer> responseTimes) {
-		int c = tasksByPeriod.get(taskIdx).getInfo().getComputationTime();
+	private int calculateResponseTime(int taskIdx, List<Task> tasks) {
+		int c = tasks.get(taskIdx).getInfo().getComputationTime();
 		
 		if (taskIdx == 0) {
 			return c;
@@ -64,7 +97,7 @@ public class ResponseTimeAnalysis extends Scheduling {
 				r = c;
 				
 				for (int idx = taskIdx - 1; idx >= 0; --idx) {
-					TaskInfo info =  tasksByPeriod.get(idx).getInfo();
+					TaskInfo info =  tasks.get(idx).getInfo();
 					int ta = info.getPeriod();
 					int ca = info.getComputationTime();
 					
