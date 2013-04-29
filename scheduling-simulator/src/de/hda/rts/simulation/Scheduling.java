@@ -32,6 +32,15 @@ public abstract class Scheduling {
 		Collections.sort(waitingTasks, getPriorityComparator());
 		model = new ScheduleModel(toString(), tasks);
 		
+		printResponseTimes();
+	}
+	
+	protected void printResponseTimes() {
+		for (int idx = 0; idx < tasks.size(); ++idx) {
+			int rta = calculateResponseTime(idx, tasks);
+			System.out.printf("RTA(%s): %d\n", tasks.get(idx), rta);
+		}
+		System.out.println("--------------------------------------------");
 	}
 
 	public boolean doNextStep(int treshhold) {
@@ -144,6 +153,37 @@ public abstract class Scheduling {
 	}
 
 	protected abstract Comparator<Task> getPriorityComparator();
+	
+	protected int calculateResponseTime(int taskIdx, List<Task> tasks) {
+		int c = tasks.get(taskIdx).getInfo().getComputationTime();
+		
+		if (taskIdx == 0) {
+			return c;
+		}
+		else {
+			
+			int rOld = c;
+			int r = -1;
+			
+			while (r != rOld) {
+				rOld = r;
+				r = c;
+				
+				// FIXME: Check if Deadline is exceeded
+				for (int idx = taskIdx - 1; idx >= 0; --idx) {
+					TaskInfo info =  tasks.get(idx).getInfo();
+					int ta = info.getPeriod();
+					int ca = info.getComputationTime();
+					
+					int s = (int) Math.ceil((double) rOld / ta);
+					
+					r += s*ca;
+				}
+			}
+			
+			return r;
+		}		
+	}
 	
 	protected Task getComputingTask() {
 		return computingTask;
