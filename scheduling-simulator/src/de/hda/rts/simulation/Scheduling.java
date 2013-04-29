@@ -155,21 +155,20 @@ public abstract class Scheduling {
 	protected abstract Comparator<Task> getPriorityComparator();
 	
 	protected int calculateResponseTime(int taskIdx, List<Task> tasks) {
-		int c = tasks.get(taskIdx).getInfo().getComputationTime();
+		Task task = tasks.get(taskIdx);
+		int c = task.getInfo().getComputationTime();
 		
 		if (taskIdx == 0) {
 			return c;
 		}
 		else {
-			
 			int rOld = c;
 			int r = -1;
 			
-			while (r != rOld) {
+			while (r != rOld && r <= task.getInfo().getDeadline()) {
 				rOld = r;
 				r = c;
 				
-				// FIXME: Check if Deadline is exceeded
 				for (int idx = taskIdx - 1; idx >= 0; --idx) {
 					TaskInfo info =  tasks.get(idx).getInfo();
 					int ta = info.getPeriod();
