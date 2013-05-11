@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task-config>
+	<resources no-resource="E" />
+	<tasks>
+		<task name="D" execution="EE" period="10" deadline="9" />
+		<task name="C" execution="E" period="5" deadline="5" />
+		<task name="B" execution="E" period="6" deadline="6" />
+		<task name="A" execution="E" period="3" deadline="3" />
+	</tasks>
+</task-config>

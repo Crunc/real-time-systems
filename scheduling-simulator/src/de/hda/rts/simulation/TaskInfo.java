@@ -1,36 +1,30 @@
 package de.hda.rts.simulation;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 public class TaskInfo {
-	private final String name;
-	private final int computationTime;
-	private final int period;
-	private final int deadline;
-	private final String strRepresentation;
-
-	private TaskInfo(String taskName, int c, int p, int d) {
-		name = taskName;
-		computationTime = c;
-		period = p;
-		deadline = d;
-		strRepresentation = new StringBuilder(name).append(" C:")
-				.append(computationTime).append(" P:").append(period)
-				.append(" D:").append(deadline).toString();
-	}
+	
+	public static final int NO_PRIORITY = 0;
+	
+	private String name;
+	private TaskExecution execution;
+	private int period;
+	private int deadline;
+	private int priority = NO_PRIORITY;
 
 	public String getName() {
 		return name;
 	}
+	
+	public TaskExecution getExecution() {
+		return execution;
+	}
 
 	public int getComputationTime() {
-		return computationTime;
+		return execution.size();
 	}
 
 	public int getPeriod() {
@@ -39,6 +33,10 @@ public class TaskInfo {
 
 	public int getDeadline() {
 		return deadline;
+	}
+
+	public int getPriority() {
+		return priority;
 	}
 
 	@Override
@@ -68,120 +66,92 @@ public class TaskInfo {
 
 	@Override
 	public String toString() {
-		return strRepresentation;
+		return Objects.toStringHelper(TaskInfo.class)
+				.add("name", getName())
+				.add("execution", Joiner.on("").join(execution))
+				.add("period", getPeriod())
+				.add("deadline", getDeadline())
+				.add("priority", getPriority() == NO_PRIORITY ? "none" : getPriority())
+				.toString();
 	}
 
-	public static TaskInfo parseTask(String config) {
-		if (config == null) {
-			throw new IllegalArgumentException("config must not be null");
-		}
-
-		StringTokenizer tokens = new StringTokenizer(config, " ");
-
-		if (tokens.countTokens() < 3) {
-			throw new IllegalArgumentException(
-					"config must contain at least a name, a computationTime and a period: "
-							+ config);
-		}
-
-		// ----------------------------------------------------------
-		// name
-		// ----------------------------------------------------------
-		String nameToken = tokens.nextToken().trim();
-
-		if (nameToken == null || nameToken.length() == 0) {
-			throw new IllegalArgumentException(
-					"config must start with a task name: " + config);
-		}
-
-		// ----------------------------------------------------------
-		// computationTime
-		// ----------------------------------------------------------
-		int computationTime = -1;
-		String computationTimeToken = tokens.nextToken().trim();
-
-		if (computationTimeToken == null || computationTimeToken.length() == 0) {
-			throw new IllegalArgumentException(
-					"config must contain a computationTime: " + config);
-		}
-
-		try {
-			computationTime = Integer.parseInt(computationTimeToken);
-		} catch (NumberFormatException ex) {
-			throw new IllegalArgumentException(
-					"computationTime must be a numeric value: " + config);
-		}
-
-		// ----------------------------------------------------------
-		// period
-		// ----------------------------------------------------------
-		int period = -1;
-		String periodToken = tokens.nextToken().trim();
-		if (periodToken == null || periodToken.length() == 0) {
-			throw new IllegalArgumentException("config must contain a period: "
-					+ config);
-		}
-
-		try {
-			period = Integer.parseInt(periodToken);
-		} catch (NumberFormatException ex) {
-			throw new IllegalArgumentException(
-					"period must be a numeric value: " + config);
-		}
-
-		// ----------------------------------------------------------
-		// deadline
-		// ----------------------------------------------------------
-		int deadline = period;
-		if (tokens.hasMoreTokens()) {
-
-			String deadlineToken = tokens.nextToken().trim();
-			if (deadlineToken != null && deadlineToken.length() > 0) {
-				try {
-					deadline = Integer.parseInt(deadlineToken);
-				} catch (NumberFormatException ex) {
-					throw new IllegalArgumentException(
-							"deadline must be a numeric value: " + config);
-				}
-			}
-		}
-
-		return new TaskInfo(nameToken, computationTime, period, deadline);
-	}
-
-	public static List<TaskInfo> parseConfiguration(InputStream inStream) {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				inStream));
-		List<TaskInfo> tasks = new ArrayList<TaskInfo>();
-
-		int lineCount = 0;
-		String line = null;
-
-		do {
-			try {
-				++lineCount;
-				line = reader.readLine();
-				
-				if (line != null) {
-					line = line.trim();
-					
-					if(!isComment(line)) {
-						TaskInfo task = TaskInfo.parseTask(line);
-						tasks.add(task);
-					}
-				}
-			} catch (IOException ex) {
-				System.err.println("failed to read line " + lineCount);
-			} catch (IllegalArgumentException ex) {
-				System.err.println("failed to parse line " + lineCount + ": "
-						+ ex.getMessage());
-			}
-		} while (line != null);
-
-		return tasks;
+	public static TaskInfo.Builder builder() {
+		return new TaskInfo.Builder();
 	}
 	
-	private static boolean isComment(String line) {
-		return line.startsWith("#") || line.startsWith("//");
+	public static class Builder {
+		
+		private TaskInfo info;
+		
+		private Builder() {
+			info = new TaskInfo();
+		}
+		
+		public Builder name(String name) {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(name), "name must not be null nor empty");
+			
+			info.name = name;
+			return this;
+		}
+		
+		public Builder period(int period) {
+			Preconditions.checkArgument(period > 0, "period must be greater than 0");
+			
+			info.period = period;
+			return this;
+		}
+		
+		public Builder period(String value) {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(value), "value must not be null nor empty");
+			
+			return period(Integer.parseInt(value));
+		}
+		
+		public Builder deadline(int deadline) {
+			Preconditions.checkArgument(deadline > 0, "deadline must be greater than 0");
+			
+			info.deadline = deadline;
+			return this;
+		}
+		
+		public Builder deadline(String value) {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(value), "value must not be null nor empty");
+			
+			return deadline(Integer.parseInt(value));
+		}
+		
+		public Builder priority(int priority) {
+			Preconditions.checkArgument(priority > 0 || priority == NO_PRIORITY, "priority must be greater than 0 or equal to NO_PRIORITY");
+			
+			info.priority = priority;
+			return this;
+		}
+		
+		public Builder priority(String value) {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(value), "value must not be null nor empty");
+			
+			return priority(Integer.parseInt(value));
+		}
+		
+		public Builder execution(TaskExecution execution) {
+			Preconditions.checkArgument(execution != null, "execution must not be null");
+			Preconditions.checkArgument(execution.size() > 0, "execution must not be empty");
+			
+			info.execution = execution;
+			return this;
+		}
+
+		public TaskInfo build() {
+			Preconditions.checkState(info.name != null, "name must be set");
+			Preconditions.checkState(info.execution != null && info.execution.size() > 0, "execution must be set");
+			Preconditions.checkState(info.period > 0, "period must be set");
+			Preconditions.checkState(info.priority > 0 || info.priority == NO_PRIORITY, "priority must be set");
+			
+			if (info.deadline <= 0) {
+				info.deadline = info.period;
+			}
+			
+			return info;
+		}
 	}
 }

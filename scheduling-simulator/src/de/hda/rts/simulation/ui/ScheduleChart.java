@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.table.AbstractTableModel;
 
 import de.hda.rts.simulation.Task;
 import de.hda.rts.simulation.data.ScheduleModel;
@@ -249,6 +250,55 @@ public class ScheduleChart extends JScrollPane implements Observer {
 			cLabel.setText(String.format("C:%d/%d", task.getComputed(), task.getInfo().getComputationTime()));
 			pLabel.setText(String.format("P:%d", task.getInfo().getPeriod()));
 			dLabel.setText(String.format("D:%d", task.getInfo().getDeadline()));
+		}
+	}
+	
+	private class ChartTableModel extends AbstractTableModel {
+
+		private static final int STEPS_OFFSET = 1;
+		
+		@Override
+		public String getColumnName(int column) {
+			switch (column) {
+			case 0:
+				return "Task";
+			default:
+				return Integer.toString(column);
+			}
+		}
+		
+		@Override
+		public int getRowCount() {
+			if (model == null) {
+				return 0;
+			}
+			
+			return model.taskCount();
+		}
+
+		@Override
+		public int getColumnCount() {
+			if (model == null) {
+				return STEPS_OFFSET;
+			}
+			
+			return model.getStepCount() + STEPS_OFFSET;
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			if (model == null || model.getTasks() == null) {
+				return 1;
+			}
+			
+			Task task = model.getTask(rowIndex);
+			
+			switch (columnIndex) {
+			case 0:
+				return task.toString();
+			default:
+				return model.getSteps(task).get(columnIndex - STEPS_OFFSET);
+			}
 		}
 	}
 }

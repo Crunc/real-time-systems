@@ -7,10 +7,6 @@ import de.hda.rts.simulation.util.Tasks;
 
 public class EarliestDeadlineFirst extends Scheduling {
 
-	public EarliestDeadlineFirst(List<TaskInfo> taskInfos) {
-		super(taskInfos);
-	}
-
 	@Override
 	protected Comparator<Task> getPriorityComparator() {
 		return Tasks.NAME_COMPARATOR;

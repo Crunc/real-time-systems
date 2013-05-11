@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ResponseTimeAnalysis extends Scheduling {
-	
-	public ResponseTimeAnalysis(List<TaskInfo> taskInfos) {
-		super(taskInfos);
-	}
 
 	@Override
 	protected Comparator<Task> getPriorityComparator() {
@@ -65,8 +61,6 @@ public class ResponseTimeAnalysis extends Scheduling {
 					ok = false;
 				}
 			}
-
-//			System.out.printf("[%d] %s: %d\n", k, set.get(k), rta);
 		}
 		
 		if (ok) {
@@ -82,7 +76,7 @@ public class ResponseTimeAnalysis extends Scheduling {
 		return "RTA";
 	}
 	
-	private void print(Map<Task, Integer> responseTimes) {
+	void print(Map<Task, Integer> responseTimes) {
 		for (Task t : responseTimes.keySet()) {
 			System.out.println(t.getInfo().getName() + " => " + responseTimes.get(t));
 		}

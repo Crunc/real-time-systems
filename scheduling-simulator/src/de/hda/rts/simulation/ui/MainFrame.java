@@ -5,10 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -22,10 +18,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
 
-import de.hda.rts.simulation.DeadlineMonotonicScheduling;
-import de.hda.rts.simulation.RateMonotonicScheduling;
 import de.hda.rts.simulation.Scheduling;
-import de.hda.rts.simulation.TaskInfo;
+import de.hda.rts.simulation.TaskConfig;
 
 public class MainFrame extends JFrame {
 
@@ -33,7 +27,6 @@ public class MainFrame extends JFrame {
 	
 	private static final String TITLE = "Scheduling Simulation";
 	private static final String LIST_LABEL = "Choose a task configuration";
-	private static final String START_LABEL = "Start";
 	
 	private final Class<? extends Scheduling>[] schedulingTypes;
 	private final String[] resources;
@@ -41,7 +34,6 @@ public class MainFrame extends JFrame {
 	
 	private JLabel listLabel;
 	private JList resourceList;
-	private JButton startButton;
 	
 	public MainFrame(Class<? extends Scheduling>[] schedulingTypes, String[] resources) {
 		this.schedulingTypes = schedulingTypes;
@@ -118,20 +110,19 @@ public class MainFrame extends JFrame {
 					InputStream resourceStream = openResource(resourcePath);
 					
 					if (resourceStream != null) {
-						List<TaskInfo> tasks = TaskInfo.parseConfiguration(resourceStream);
+						TaskConfig config = new TaskConfig().parse(resourceStream);
 						Scheduling scheduling = null;
 						
 						try {
-							Constructor<? extends Scheduling> ctor = schedulingType.getConstructor(List.class);
-							scheduling = ctor.newInstance(tasks);
-							
+							Constructor<? extends Scheduling> ctor = schedulingType.getConstructor();
+							scheduling = ctor.newInstance();
+							scheduling.initialize(config);
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
 						
 						if (scheduling != null) {
-							ScheduleChartFrame frame = new ScheduleChartFrame(
-									scheduling);
+							ScheduleChartFrame frame = new ScheduleChartFrame(scheduling);
 							frame.setTitle(new StringBuilder()
 									.append(scheduling).append(" (")
 									.append(resourcePath).append(")")

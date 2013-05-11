@@ -9,25 +9,26 @@ import de.hda.rts.simulation.Task;
 public final class Tasks {
 
 	private Tasks() {
+		// should not be instantiated
 	}
 	
-	public static final Comparator<Task> PERIOD_COMPARATOR = new Comparator<Task>() {
+	public static final Comparator<Task> PERIOD_COMPARATOR = new NullSafeComparator<Task>() {
 		@Override
-		public int compare(Task left, Task right) {
+		public int safeCompare(Task left, Task right) {
 			return left.getInfo().getPeriod() - right.getInfo().getPeriod();
 		}
 	};
 	
-	public static final Comparator<Task> DEADLINE_COMPARATOR = new Comparator<Task>() {
+	public static final Comparator<Task> DEADLINE_COMPARATOR = new NullSafeComparator<Task>() {
 		@Override
-		public int compare(Task left, Task right) {
+		public int safeCompare(Task left, Task right) {
 			return left.getInfo().getDeadline() - right.getInfo().getDeadline();
 		}
 	};
 	
-	public static final Comparator<Task> NAME_COMPARATOR = new Comparator<Task>() {
+	public static final Comparator<Task> NAME_COMPARATOR = new NullSafeComparator<Task>() {
 		@Override
-		public int compare(Task left, Task right) {
+		public int safeCompare(Task left, Task right) {
 			return left.getInfo().getName().compareTo(right.getInfo().getName());
 		}
 	};

@@ -15,11 +15,8 @@ public class SchedulingSimulation {
 	};
 	
 	private static final String[] RESOURCES = {
-		"praktikum1_excercise3.txt", 
-		"slide_example_s11.txt", 
-		"slide_example_s14.txt",
-		"slide_example_s16.txt",
-		"slide_example_s20.txt"
+		"pip-example.xml",
+		"praktikum1_excercise3.xml"
 	};
 	
 	public static void main(String... args) {

@@ -1,32 +1,35 @@
 package de.hda.rts.simulation;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 import de.hda.rts.simulation.data.ScheduleModel;
 
 public abstract class Scheduling {
 
-	private final List<Task> tasks;
-	private final List<Task> waitingTasks;
+	private TaskConfig config;
+	private List<Task> tasks;
+	private List<Task> waitingTasks;
 	private Task computingTask;
 	private int stepCount;
 	private ScheduleModel model;
-
-	private final String analyzation;
-
-	protected Scheduling(List<TaskInfo> taskInfos) {
-		tasks = new ArrayList<Task>(taskInfos.size());
-
-		for (TaskInfo taskInfo : taskInfos) {
-			tasks.add(new Task(taskInfo));
+	private String analyzation;
+	
+	public void initialize(TaskConfig cfg) {
+		config = cfg;
+		tasks = Lists.newArrayList();
+		
+		for (TaskInfo info : cfg.getTaskInfos()) {
+			tasks.add(Task.builder().info(info).build());
 		}
 
 		stepCount = 0;
-		waitingTasks = new ArrayList<Task>(tasks);
+		waitingTasks = Lists.newArrayList(tasks);
 		analyzation = analyzeStatically();
 		Collections.sort(tasks, getPriorityComparator());
 		Collections.sort(waitingTasks, getPriorityComparator());

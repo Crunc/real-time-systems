@@ -1,12 +1,11 @@
 package de.hda.rts.simulation;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+
 public class Task {
-	private final TaskInfo info;
+	private TaskInfo info;
 	private int computed = 0;
-	
-	public Task(TaskInfo taskInfo) {
-		info = taskInfo;
-	}
 	
 	public int getComputed() {
 		return computed;
@@ -14,6 +13,26 @@ public class Task {
 	
 	public TaskInfo getInfo() {
 		return info;
+	}
+	
+	public String getName() {
+		return getInfo().getName();
+	}
+
+	public int getComputationTime() {
+		return getInfo().getComputationTime();
+	}
+
+	public int getPeriod() {
+		return getInfo().getPeriod();
+	}
+
+	public int getDeadline() {
+		return getInfo().getDeadline();
+	}
+
+	public int getPriority() {
+		return getInfo().getPriority();
 	}
 	
 	public boolean isFinished() {
@@ -37,7 +56,7 @@ public class Task {
 			computed = 0;
 		}
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -48,27 +67,55 @@ public class Task {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof Task)) {
 			return false;
+		}
 		Task other = (Task) obj;
 		if (info == null) {
-			if (other.info != null)
+			if (other.info != null) {
 				return false;
-		} else if (!info.equals(other.info))
+			}
+		} else if (!info.equals(other.info)) {
 			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return new StringBuilder(info.getName())
-			.append(" C:").append(computed).append("/").append(info.getComputationTime())
-			.append(" P:").append(info.getPeriod())
-			.append(" D:").append(info.getDeadline())
-			.toString();
+		return Objects.toStringHelper(Task.class)
+				.add("info", getInfo())
+				.toString();
+	}
+	
+	public static Task.Builder builder() {
+		return new Task.Builder();
+	}
+	
+	public static class Builder {
+		private final Task task;
+		
+		private Builder() {
+			task = new Task();
+		}
+		
+		public Builder info(TaskInfo info) {
+			Preconditions.checkArgument(info != null, "info must not be null");
+			
+			task.info = info;
+			return this;
+		}
+		
+		public Task build() {
+			Preconditions.checkState(task.info != null, "info must be set");
+			
+			return task;
+		}
 	}
 }

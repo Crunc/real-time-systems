@@ -1,5 +1,6 @@
 package de.hda.rts.simulation.data;
 
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +31,11 @@ public class ScheduleModel extends Observable {
 		int taskIdx = -1;
 		for (Task t: tasks) {
 			if (t.equals(task)) {
-				steps.get(t).add(new Step(task));
+				getSteps(t).add(new Step(StepType.EXECUTE, 0, "E"));
 				taskIdx = idx;
 			}
 			else {
-				steps.get(t).add(new Step(null));
+				getSteps(t).add(new Step(StepType.WAIT, 0, ""));
 			}
 			
 			++idx;
@@ -49,8 +50,20 @@ public class ScheduleModel extends Observable {
 		return tasks;
 	}
 	
+	public Task getTask(int index) {
+		return tasks.get(index);
+	}
+	
+	public List<Step> getSteps(Task task) {
+		return steps.get(task);
+	}
+	
 	public int taskCount() {
 		return steps.size();
+	}
+	
+	public int getStepCount() {
+		return stepCount;
 	}
 	
 	@Override
@@ -93,21 +106,24 @@ public class ScheduleModel extends Observable {
 		return out.toString();
 	}
 	
-	private class Step {		
-		public Task task;
+	public enum StepType {
+		WAIT, EXECUTE, RESOURCE;
+	}
+	
+	public class Step {		
+		public final StepType type;
+		public final int priority;
+		public final String resource;
 		
-		private Step(Task task) {
-			this.task = task;
+		private Step(StepType type, int priority, String resource) {
+			this.type = type;
+			this.priority = priority;
+			this.resource = resource;
 		}
 		
 		@Override
 		public String toString() {
-			if (task != null) {
-				return task.getInfo().getName();
-			}
-			else {
-				return " ";
-			}
+			return MessageFormat.format("{0}", resource);
 		}
 	}
 }

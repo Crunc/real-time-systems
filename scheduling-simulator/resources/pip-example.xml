@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task-config>
+	<resources no-resource="E">
+		<resource name="Q" />
+		<resource name="V" />
+	</resources>
+	<tasks>
+		<task name="D" priority="4" execution="EEQVE" release-time="4" period="20" />
+		<task name="C" priority="3" execution="EVVE" release-time="2" period="20" />
+		<task name="B" priority="2" execution="EE" release-time="2" period="20" />
+		<task name="A" priority="1" execution="EQQQQE" release-time="0" period="20" />
+	</tasks>
+</task-config>
+
