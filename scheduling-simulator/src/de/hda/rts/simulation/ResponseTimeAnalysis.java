@@ -6,15 +6,21 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+
 public class ResponseTimeAnalysis extends Scheduling {
 
 	@Override
 	protected Comparator<Task> getPriorityComparator() {
 		return new Comparator<Task>() {
-			private final List<Task> rtaList = sortByResponseTime(getTasks());
+			private List<Task> rtaList;
 			
 			@Override
 			public int compare(Task left, Task right) {
+				if (rtaList == null) {
+					rtaList = sortByResponseTime(Lists.newArrayList(getTasks()));
+				}
+				
 				Integer leftRt = rtaList.indexOf(left);
 				Integer rightRt = rtaList.indexOf(right);
 				return leftRt - rightRt;

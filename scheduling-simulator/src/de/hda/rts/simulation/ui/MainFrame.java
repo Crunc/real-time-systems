@@ -20,6 +20,7 @@ import javax.swing.ListModel;
 
 import de.hda.rts.simulation.Scheduling;
 import de.hda.rts.simulation.TaskConfig;
+import de.hda.rts.simulation.TaskConfigParser;
 
 public class MainFrame extends JFrame {
 
@@ -110,7 +111,7 @@ public class MainFrame extends JFrame {
 					InputStream resourceStream = openResource(resourcePath);
 					
 					if (resourceStream != null) {
-						TaskConfig config = new TaskConfig().parse(resourceStream);
+						TaskConfig config = TaskConfigParser.parse(resourceStream);
 						Scheduling scheduling = null;
 						
 						try {

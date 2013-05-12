@@ -1,16 +1,19 @@
 package de.hda.rts.simulation;
 
+import java.util.List;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 public class TaskInfo {
 	
 	public static final int NO_PRIORITY = 0;
 	
 	private String name;
-	private TaskExecution execution;
+	private List<String> execution;
 	private int period;
 	private int deadline;
 	private int priority = NO_PRIORITY;
@@ -19,7 +22,7 @@ public class TaskInfo {
 		return name;
 	}
 	
-	public TaskExecution getExecution() {
+	public List<String> getExecution() {
 		return execution;
 	}
 
@@ -133,7 +136,22 @@ public class TaskInfo {
 			return priority(Integer.parseInt(value));
 		}
 		
-		public Builder execution(TaskExecution execution) {
+		public Builder execution(String value) {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(value), "value must not be null nor empty");
+			
+			String[] resNames = value.trim().split("");
+			List<String> execution = Lists.newArrayListWithCapacity(resNames.length);
+			
+			for (String name: resNames) {
+				if (!Strings.isNullOrEmpty(name)) {
+					execution.add(name);
+				}
+			}
+			
+			return execution(execution);
+		}
+		
+		public Builder execution(List<String> execution) {
 			Preconditions.checkArgument(execution != null, "execution must not be null");
 			Preconditions.checkArgument(execution.size() > 0, "execution must not be empty");
 			

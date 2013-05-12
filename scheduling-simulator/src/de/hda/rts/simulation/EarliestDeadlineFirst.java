@@ -1,7 +1,6 @@
 package de.hda.rts.simulation;
 
 import java.util.Comparator;
-import java.util.List;
 
 import de.hda.rts.simulation.util.Tasks;
 
@@ -36,12 +35,10 @@ public class EarliestDeadlineFirst extends Scheduling {
 
 	@Override
 	protected Task getNextTask() {
-		List<Task> waitingTasks = getWaitingTasks();
-
 		Task next = null;
 		int nextDist = Integer.MAX_VALUE;
 		
-		for (Task task: waitingTasks) {
+		for (Task task: getWaitingTasks()) {
 			int dist = getDeadlineDistance(task);
 			if (dist < nextDist) {
 				next = task;

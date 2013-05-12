@@ -1,22 +1,27 @@
 package de.hda.rts.simulation.data;
 
 import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Observable;
 
+import com.google.common.base.Preconditions;
+
+import de.hda.rts.simulation.Resource;
 import de.hda.rts.simulation.Task;
 import de.hda.rts.simulation.util.Tasks;
 
 public class ScheduleModel extends Observable {
 
 	private final String name;
-	private final List<Task> tasks;
+	private final NavigableSet<Task> tasks;
 	private final Map<Task, List<Step>> steps;
 	private int stepCount = 0;
 	
-	public ScheduleModel(String name, List<Task> tasks) {
+	public ScheduleModel(String name, NavigableSet<Task> tasks) {
 		this.name = name;
 		this.tasks = tasks;
 		steps = Tasks.newTaskMap();
@@ -26,32 +31,45 @@ public class ScheduleModel extends Observable {
 		}
 	}
 	
-	public void addStep(Task task) {
-		int idx = 0;
-		int taskIdx = -1;
+	public void addStep(Task task, Resource resource) {
 		for (Task t: tasks) {
 			if (t.equals(task)) {
-				getSteps(t).add(new Step(StepType.EXECUTE, 0, "E"));
-				taskIdx = idx;
+				getSteps(t).add(new Step(StepType.EXECUTE, 0, task, resource));
 			}
 			else {
-				getSteps(t).add(new Step(StepType.WAIT, 0, ""));
+				getSteps(t).add(new Step(StepType.WAIT, 0, t, null));
 			}
-			
-			++idx;
 		}
 		
 		++stepCount;
 		setChanged();
-		notifyObservers(taskIdx);
+		notifyObservers(stepCount - 1);
 	}
 	
-	public List<Task> getTasks() {
+	public NavigableSet<Task> getTasks() {
 		return tasks;
 	}
 	
 	public Task getTask(int index) {
-		return tasks.get(index);
+		Preconditions.checkElementIndex(index, tasks.size());
+		
+		int idx = 0;
+		Iterator<Task> iter = tasks.iterator();
+		
+		while (iter.hasNext() && idx < index) {
+			iter.next();
+			++idx;
+		}
+		
+		if (iter.hasNext()) {
+			return iter.next();
+		}
+		
+		return null;
+	}
+
+	public Step getStep(Task task, int i) {
+		return steps.get(task).get(i);
 	}
 	
 	public List<Step> getSteps(Task task) {
@@ -113,17 +131,23 @@ public class ScheduleModel extends Observable {
 	public class Step {		
 		public final StepType type;
 		public final int priority;
-		public final String resource;
+		public final Resource resource;
+		public final Task task;
 		
-		private Step(StepType type, int priority, String resource) {
+		private Step(StepType type, int priority, Task task, Resource resource) {
 			this.type = type;
 			this.priority = priority;
 			this.resource = resource;
+			this.task = task;
 		}
 		
 		@Override
 		public String toString() {
-			return MessageFormat.format("{0}", resource);
+			if (task != null && resource != null) {
+				return MessageFormat.format("{0} ({1})", task.getName(), resource.getName());
+			}
+			
+			return "";
 		}
 	}
 }

@@ -1,20 +1,10 @@
 package de.hda.rts.simulation;
 
-import java.io.InputStream;
 import java.util.Map;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.DefaultHandler2;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-
-import de.hda.rts.simulation.util.Log;
 
 public class TaskConfig {
 
@@ -32,6 +22,10 @@ public class TaskConfig {
 	 */
 	private Map<String, TaskInfo> taskInfos = Maps.newHashMap();
 
+	protected TaskConfig() {
+		
+	}
+	
 	public ResourceInfo getResource(String name) {
 		if (noResource != null && noResource.equals(name)) {
 			return ResourceInfo.NO_RESOURCE;
@@ -52,153 +46,42 @@ public class TaskConfig {
 		return resourceInfos.values();
 	}
 	
-	public TaskConfig parse(InputStream inStream) {
-		Preconditions.checkArgument(inStream != null, "inStream must not be null");
+	public static TaskConfig.Builder builder() {
+		return new TaskConfig.Builder();
+	}
+	
+	public static class Builder {
+		private TaskConfig config;
+		
+		private Builder() {
+			config = new TaskConfig();
+		}
 
-		try {
-			SAXParserFactory factory = SAXParserFactory.newInstance();
-			SAXParser parser = factory.newSAXParser();
+		public Builder noResource(String noResource) {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(noResource), "noResource must not be null nor empty");
 			
-			parser.parse(inStream, new TaskConfig.SaxHandler());
+			config.noResource = noResource;
 			return this;
-		} 
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	private interface SaxStartAction {
-		void handle(String uri, String localName, String qName, Attributes attributes);
-	}
-	
-	private interface SaxEndAction {
-		void handle(String uri, String localName, String qName);
-	}
-	
-	private class SaxHandler extends DefaultHandler2 {
-		private TaskInfo.Builder taskInfo;
-		private ResourceInfo.Builder resourceInfo;
-		
-		private Map<String, SaxStartAction> startActions = Maps.newHashMap();
-		private Map<String, SaxEndAction> endActions = Maps.newHashMap();
-		
-		public SaxHandler() {
-			initStartActions();
-			initEndActions();
 		}
 		
-		void initStartActions() {
-			startActions.put("resources", new SaxStartAction() {
-				@Override
-				public void handle(String uri, String localName, String qName, Attributes attributes) {
-					String noRes = attributes.getValue("no-resource");					
-					TaskConfig.this.noResource = noRes;
-				}
-			});
+		public Builder resourceInfo(ResourceInfo info) {
+			Preconditions.checkArgument(info != null, "info must not be null");
 			
-			startActions.put("resource", new SaxStartAction() {
-				@Override
-				public void handle(String uri, String localName, String qName, Attributes attributes) {
-					String name = attributes.getValue("name");
-					
-					resourceInfo = ResourceInfo.builder();
-					
-					if (name != null) {
-						resourceInfo.name(name);
-					}
-				}
-			});
-			
-			startActions.put("task", new SaxStartAction() {
-				@Override
-				public void handle(String uri, String localName, String qName, Attributes attributes) {
-					String name = attributes.getValue("name");
-					String exec = attributes.getValue("execution");
-					int period = parseInt(attributes, "period", 0);
-					int deadline = parseInt(attributes, "deadline", 0);
-					int priority = parseInt(attributes, "priority", 0);
-					
-					taskInfo = TaskInfo.builder();
-					
-					if (!Strings.isNullOrEmpty(name)) {
-						taskInfo.name(name);
-					}
-					
-					if (!Strings.isNullOrEmpty(exec)) {
-						TaskExecution execution = TaskExecution.parse(exec, TaskConfig.this);
-						taskInfo.execution(execution);
-					}
-					
-					if (period > 0) {
-						taskInfo.period(period);
-					}
-					
-					if (deadline > 0) {
-						taskInfo.deadline(deadline);
-					}
-					
-					if (priority > 0) {
-						taskInfo.priority(priority);
-					}		
-				}
-			});
+			config.resourceInfos.put(info.getName(), info);
+			return this;
 		}
 		
-		void initEndActions() {
-			endActions.put("resource", new SaxEndAction() {
-				@Override
-				public void handle(String uri, String localName, String qName) {
-					ResourceInfo res = resourceInfo.build();
-					resourceInfos.put(res.getName(), res);
-					resourceInfo = null;
-				}
-			});
+		public Builder taskInfo(TaskInfo info) {
+			Preconditions.checkArgument(info != null, "info must not be null");
 			
-			endActions.put("task", new SaxEndAction() {
-				@Override
-				public void handle(String uri, String localName, String qName) {
-					TaskInfo ti = taskInfo.build();
-					taskInfos.put(ti.getName(), ti);
-					taskInfo = null;
-				}
-			});
+			config.taskInfos.put(info.getName(), info);
+			return this;
 		}
 		
-		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-			SaxStartAction action = startActions.get(qName);
+		public TaskConfig build() {
+			Preconditions.checkState(!Strings.isNullOrEmpty(config.noResource), "noResource must be set");
 			
-			if (action != null) {
-				action.handle(uri, localName, qName, attributes);
-			}
-		}
-
-		@Override
-		public void endElement(String uri, String localName, String qName)
-				throws SAXException {
-			SaxEndAction action = endActions.get(qName);
-			
-			if (action != null) {
-				action.handle(uri, localName, qName);
-			}
-		}
-		
-		int parseInt(Attributes attributes, String name, int defaultValue) {
-			Preconditions.checkArgument(attributes != null, "attributes must not be null");
-			Preconditions.checkArgument(!Strings.isNullOrEmpty(name), "name must not be null nor empty");
-			
-			String value = attributes.getValue(name);
-			
-			if (value != null) {
-				try {
-					return Integer.parseInt(value);
-				}
-				catch (NumberFormatException ex) {
-					Log.e(TAG, "failed to parse attribute {0}=\"{1}\"", name, value);
-				}
-			}
-			
-			return defaultValue;
+			return config;
 		}
 	}
 }

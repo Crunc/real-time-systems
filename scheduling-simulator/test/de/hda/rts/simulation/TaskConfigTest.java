@@ -48,7 +48,7 @@ public class TaskConfigTest {
 	public void testParsing() throws Exception {
 		InputStream inStream = new ByteArrayInputStream(XML.getBytes("UTF-8"));
 		
-		TaskConfig cfg = new TaskConfig().parse(inStream);
+		TaskConfig cfg = TaskConfigParser.parse(inStream);
 		
 		assertNotNull(cfg);
 		
