@@ -1,6 +1,7 @@
 package de.hda.rts.simulation.data;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,11 +18,11 @@ import de.hda.rts.simulation.util.Tasks;
 public class ScheduleModel extends Observable {
 
 	private final String name;
-	private final NavigableSet<Task> tasks;
+	private final Collection<Task> tasks;
 	private final Map<Task, List<Step>> steps;
 	private int stepCount = 0;
 	
-	public ScheduleModel(String name, NavigableSet<Task> tasks) {
+	public ScheduleModel(String name, Collection<Task> tasks) {
 		this.name = name;
 		this.tasks = tasks;
 		steps = Tasks.newTaskMap();
@@ -56,7 +57,7 @@ public class ScheduleModel extends Observable {
 		notifyObservers(stepCount - 1);
 	}
 	
-	public NavigableSet<Task> getTasks() {
+	public Collection<Task> getTasks() {
 		return tasks;
 	}
 	
@@ -135,7 +136,7 @@ public class ScheduleModel extends Observable {
 	}
 	
 	public enum StepType {
-		WAIT, BLOCK, EXEC, DONE;
+		NOT_RELEASED, WAITING, BLOCKED, EXECUTING, DONE;
 	}
 	
 	public class Step {		

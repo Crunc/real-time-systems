@@ -10,8 +10,8 @@ public class SchedulingSimulation {
 	private static final Class<? extends Scheduling>[] SCHEDULINGS = (Class<? extends Scheduling>[]) new Class<?>[] {
 		RateMonotonicScheduling.class,
 		DeadlineMonotonicScheduling.class,
-		ResponseTimeAnalysis.class,
-		EarliestDeadlineFirst.class
+		EarliestDeadlineFirst.class,
+		PriorityInheritanceProtocol.class
 	};
 	
 	private static final String[] RESOURCES = {

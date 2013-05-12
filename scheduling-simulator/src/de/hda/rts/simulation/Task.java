@@ -9,6 +9,7 @@ import com.google.common.base.Preconditions;
 public class Task {
 	private TaskInfo info;
 	private int computed = 0;
+	private boolean released = false;
 	
 	public int getComputed() {
 		return computed;
@@ -62,12 +63,16 @@ public class Task {
 		return getInfo().getReleaseTime();
 	}
 	
+	public boolean isReleased() {
+		return getReleaseTime() == 0 || released;
+	}
+	
 	public boolean isFinished() {
 		return computed >= getExecution().size();
 	}
 	
 	public boolean isWaiting() {
-		return computed < getExecution().size();
+		return isReleased() && computed < getExecution().size();
 	}
 	
 	public void compute() {
@@ -79,6 +84,7 @@ public class Task {
 	}
 	
 	public void update(int step) {
+		released = step > getReleaseTime();
 		if (step % info.getPeriod() == 0) {
 			computed = 0;
 		}

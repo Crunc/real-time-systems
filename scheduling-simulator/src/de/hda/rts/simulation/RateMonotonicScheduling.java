@@ -2,13 +2,23 @@ package de.hda.rts.simulation;
 
 import java.util.Comparator;
 
-import de.hda.rts.simulation.util.Tasks;
-
-public class RateMonotonicScheduling extends Scheduling {
+public class RateMonotonicScheduling extends StaticScheduling {
 
 	@Override
 	protected Comparator<Task> getPriorityComparator() {
-		return Tasks.PERIOD_COMPARATOR;
+		return new Comparator<Task>() {
+
+			@Override
+			public int compare(Task left, Task right) {
+				int result = left.getPeriod() -  right.getPeriod();
+				
+				if (result == 0) {
+					return -1;
+				}
+				
+				return result;
+			}
+		};
 	}
 	
 	@Override

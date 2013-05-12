@@ -1,16 +1,13 @@
 package de.hda.rts.simulation;
 
-import java.util.Comparator;
-import java.util.NavigableSet;
-
-import de.hda.rts.simulation.util.Tasks;
+import java.util.List;
 
 public class EarliestDeadlineFirst extends Scheduling {
 
-	@Override
-	protected Comparator<Task> getPriorityComparator() {
-		return Tasks.NAME_COMPARATOR;
-	}
+//	@Override
+//	protected SchedulingComparator<Task> getPriorityComparator() {
+//		return Tasks.NAME_COMPARATOR;
+//	}
 	
 	@Override
 	protected String analyzeStatically() {
@@ -35,7 +32,7 @@ public class EarliestDeadlineFirst extends Scheduling {
 	}
 
 	@Override
-	protected Task getNextTask(NavigableSet<Task> availableTasks) {
+	protected Task getNextTask(List<Task> availableTasks) {
 		Task next = null;
 		int nextDist = Integer.MAX_VALUE;
 		
@@ -59,5 +56,17 @@ public class EarliestDeadlineFirst extends Scheduling {
 	@Override
 	public String toString() {
 		return "EDF";
+	}
+
+	@Override
+	protected void calculatePriorities() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected int getPriority(Task task) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

@@ -26,13 +26,15 @@ import de.hda.rts.simulation.util.Tasks;
 public class ScheduleChartRenderer implements TableCellRenderer {
 
 	private TaskLabel labelCell = new TaskLabel();
-	private StepCell stepCell = new StepCell(false);
+	private StepCell stepCell = new StepCell();
 	
 	private Color defaultColor = Color.white;
 	private Color blockedColor = Color.black;
+	private Color notReleasedColor = Color.lightGray;
 	
 	private List<Color> colors = Lists.newArrayList(Color.cyan, Color.red, Color.green, Color.magenta);
 	private Map<Task, Color> taskColors = Maps.newTreeMap(Tasks.NAME_COMPARATOR);
+	
 
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -53,7 +55,7 @@ public class ScheduleChartRenderer implements TableCellRenderer {
 		Color color;
 		
 		switch (step.type) {
-		case EXEC:
+		case EXECUTING:
 			color = taskColors.get(step.task);
 			
 			if (color == null) {
@@ -68,8 +70,12 @@ public class ScheduleChartRenderer implements TableCellRenderer {
 			}
 			break;
 			
-		case BLOCK:
+		case BLOCKED:
 			color = blockedColor;
+			break;
+		
+		case NOT_RELEASED:
+			color = notReleasedColor;
 			break;
 			
 		default:
@@ -82,7 +88,7 @@ public class ScheduleChartRenderer implements TableCellRenderer {
 	}
 	
 	protected String getLabel(ScheduleModel.Step step) {
-		if (step.type == ScheduleModel.StepType.WAIT || step.resource == null || step.resource == Resource.NO_RESOURCE) {
+		if (step.type == ScheduleModel.StepType.WAITING || step.resource == null || step.resource == Resource.NO_RESOURCE) {
 			return null;
 		}
 		
@@ -91,35 +97,23 @@ public class ScheduleChartRenderer implements TableCellRenderer {
 	
 	private class StepCell extends JLabel {
 		private static final long serialVersionUID = -6239665620665589451L;
-		
-		Border unselectedBorder = null;
-		Border selectedBorder = null;
-		boolean isBordered = true;
 
-		private StepCell(boolean isBordered) {
-			this.isBordered = isBordered;
+		private StepCell() {
 			setOpaque(true); // MUST do this for background to show up.
 		}
 		
 		private void update(JTable table, ScheduleModel.Step step, boolean isSelected, boolean hasFocus, int row, int column) {
 			Color color = getColor(step);
 			setBackground(color);
-			if (isBordered) {
-				if (isSelected) {
-					if (selectedBorder == null) {
-						selectedBorder = BorderFactory.createMatteBorder(2, 5, 2, 5, table.getSelectionBackground());
-					}
-					setBorder(selectedBorder);
-				} else {
-					if (unselectedBorder == null) {
-						unselectedBorder = BorderFactory.createMatteBorder(2, 5, 2, 5, table.getBackground());
-					}
-					setBorder(stepCell.unselectedBorder);
-				}
-			}
-
 			setText(getLabel(step));
 			setToolTipText(step.toString());
+			
+			if (step.type == ScheduleModel.StepType.BLOCKED) {
+				setForeground(Color.white);
+			}
+			else {
+				setForeground(Color.darkGray);
+			}
 		}
 	}
 	

@@ -10,7 +10,7 @@ public final class Resources {
 		throw new UnsupportedOperationException(Resources.class.getName() + " can not be initialized");
 	}
 	
-	public static Comparator<Resource> NAME_COMPARATOR = new NullSafeComparator<Resource>() {
+	public static Comparator<Resource> NAME_COMPARATOR = new SchedulingComparator<Resource>() {
 		@Override
 		protected int safeCompare(Resource left, Resource right) {
 			return left.getName().compareTo(right.getName());

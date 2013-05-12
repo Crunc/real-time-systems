@@ -2,7 +2,7 @@ package de.hda.rts.simulation.util;
 
 import java.util.Comparator;
 
-public abstract class NullSafeComparator<T> implements Comparator<T> {
+public abstract class SchedulingComparator<T> implements Comparator<T> {
 	@Override
 	public int compare(T left, T right) {
 		if (left == null) {
@@ -25,6 +25,10 @@ public abstract class NullSafeComparator<T> implements Comparator<T> {
 				return safeCompare(left, right);
 			}
 		}
+	}
+	
+	public void refresh(int step) {
+		
 	}
 	
 	protected int compareNullToNull() {
