@@ -29,6 +29,8 @@ public class ScheduleChartRenderer implements TableCellRenderer {
 	private StepCell stepCell = new StepCell(false);
 	
 	private Color defaultColor = Color.white;
+	private Color blockedColor = Color.black;
+	
 	private List<Color> colors = Lists.newArrayList(Color.cyan, Color.red, Color.green, Color.magenta);
 	private Map<Task, Color> taskColors = Maps.newTreeMap(Tasks.NAME_COMPARATOR);
 
@@ -48,21 +50,32 @@ public class ScheduleChartRenderer implements TableCellRenderer {
 	}
 
 	protected synchronized Color getColor(ScheduleModel.Step step) {
-		if (step.type == ScheduleModel.StepType.WAIT || step.task == null) {
-			return defaultColor;
-		}
+		Color color;
 		
-		Color color = taskColors.get(step.task);
-		
-		if (color == null) {
-			if (!colors.isEmpty()) {
-				color = colors.remove(0);
-			}
-			else {
-				color = Color.black;
-			}
+		switch (step.type) {
+		case EXEC:
+			color = taskColors.get(step.task);
 			
-			taskColors.put(step.task, color);
+			if (color == null) {
+				if (!colors.isEmpty()) {
+					color = colors.remove(0);
+				}
+				else {
+					color = Color.black;
+				}
+				
+				taskColors.put(step.task, color);
+			}
+			break;
+			
+		case BLOCK:
+			color = blockedColor;
+			break;
+			
+		default:
+			color = defaultColor;
+			break;
+		
 		}
 		
 		return color;

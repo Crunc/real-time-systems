@@ -31,16 +31,26 @@ public class ScheduleModel extends Observable {
 		}
 	}
 	
-	public void addStep(Task task, Resource resource) {
-		for (Task t: tasks) {
-			if (t.equals(task)) {
-				getSteps(t).add(new Step(StepType.EXECUTE, 0, task, resource));
-			}
-			else {
-				getSteps(t).add(new Step(StepType.WAIT, 0, t, null));
-			}
-		}
-		
+//	public void addSteps(Task task, Resource resource) {
+//		for (Task t: tasks) {
+//			if (t.equals(task)) {
+//				getSteps(t).add(new Step(StepType.EXEC, 0, task, resource));
+//			}
+//			else {
+//				getSteps(t).add(new Step(StepType.WAIT, 0, t, null));
+//			}
+//		}
+//		
+//		++stepCount;
+//		setChanged();
+//		notifyObservers(stepCount - 1);
+//	}
+	
+	public void addStep(StepType type, Task task, Resource resource) {
+		getSteps(task).add(new Step(type, 0, task, resource));
+	}
+	
+	public void finishStep() {
 		++stepCount;
 		setChanged();
 		notifyObservers(stepCount - 1);
@@ -81,7 +91,7 @@ public class ScheduleModel extends Observable {
 	}
 	
 	public int getStepCount() {
-		return stepCount;
+		return steps.values().iterator().next().size();
 	}
 	
 	@Override
@@ -125,7 +135,7 @@ public class ScheduleModel extends Observable {
 	}
 	
 	public enum StepType {
-		WAIT, EXECUTE, RESOURCE;
+		WAIT, BLOCK, EXEC, DONE;
 	}
 	
 	public class Step {		

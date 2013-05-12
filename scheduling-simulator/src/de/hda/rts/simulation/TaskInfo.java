@@ -16,7 +16,9 @@ public class TaskInfo {
 	private List<String> execution;
 	private int period;
 	private int deadline;
+	
 	private int priority = NO_PRIORITY;
+	private int releaseTime = 0;
 
 	public String getName() {
 		return name;
@@ -40,6 +42,10 @@ public class TaskInfo {
 
 	public int getPriority() {
 		return priority;
+	}
+	
+	public int getReleaseTime() {
+		return releaseTime;
 	}
 
 	@Override
@@ -75,6 +81,7 @@ public class TaskInfo {
 				.add("period", getPeriod())
 				.add("deadline", getDeadline())
 				.add("priority", getPriority() == NO_PRIORITY ? "none" : getPriority())
+				.add("releaseTime", getReleaseTime())
 				.toString();
 	}
 
@@ -134,6 +141,19 @@ public class TaskInfo {
 			Preconditions.checkArgument(!Strings.isNullOrEmpty(value), "value must not be null nor empty");
 			
 			return priority(Integer.parseInt(value));
+		}
+		
+		public Builder releaseTime(int releaseTime) {
+			Preconditions.checkArgument(releaseTime >= 0, "releaseTime must be greater than or equal to 0");
+			
+			info.releaseTime = releaseTime;
+			return this;
+		}
+		
+		public Builder releaseTime(String value) {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(value), "value must not be null nor empty");
+			
+			return releaseTime(Integer.parseInt(value));
 		}
 		
 		public Builder execution(String value) {

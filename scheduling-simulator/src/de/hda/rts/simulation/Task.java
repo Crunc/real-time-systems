@@ -1,5 +1,8 @@
 package de.hda.rts.simulation;
 
+import java.util.List;
+
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -18,6 +21,26 @@ public class Task {
 	public String getName() {
 		return getInfo().getName();
 	}
+	
+	public List<String> getExecution() {
+		return getInfo().getExecution();
+	}
+	
+	public String getLastExecutionStep() {
+		if (computed > 0 && computed <= getExecution().size()) {
+			return getExecution().get(computed - 1);
+		}
+		
+		return null;
+	}
+	
+	public String getNextExecutionStep() {
+		if (computed < getExecution().size()) {
+			return getExecution().get(computed);
+		}
+		
+		return null;
+	}
 
 	public int getComputationTime() {
 		return getInfo().getComputationTime();
@@ -35,12 +58,16 @@ public class Task {
 		return getInfo().getPriority();
 	}
 	
+	public int getReleaseTime() {
+		return getInfo().getReleaseTime();
+	}
+	
 	public boolean isFinished() {
-		return computed >= info.getComputationTime();
+		return computed >= getExecution().size();
 	}
 	
 	public boolean isWaiting() {
-		return computed < info.getComputationTime();
+		return computed < getExecution().size();
 	}
 	
 	public void compute() {
@@ -90,7 +117,12 @@ public class Task {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(Task.class)
-				.add("info", getInfo())
+				.add("name", getName())
+				.add("execution", Joiner.on("").join(getExecution()))
+				.add("period", getPeriod())
+				.add("deadline", getDeadline())
+				.add("priority", getPriority() == TaskInfo.NO_PRIORITY ? "none" : getPriority())
+				.add("releaseTime", getReleaseTime())
 				.toString();
 	}
 	

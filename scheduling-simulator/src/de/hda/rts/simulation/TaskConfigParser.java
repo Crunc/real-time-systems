@@ -87,7 +87,8 @@ public class TaskConfigParser extends DefaultHandler2 {
 				String execution = attributes.getValue("execution");
 				int period = parseInt(attributes, "period", 0);
 				int deadline = parseInt(attributes, "deadline", 0);
-				int priority = parseInt(attributes, "priority", 0);
+				int priority = parseInt(attributes, "priority", TaskInfo.NO_PRIORITY);
+				int releaseTime = parseInt(attributes, "release-time", 0);
 
 				taskInfo = TaskInfo.builder();
 
@@ -107,8 +108,12 @@ public class TaskConfigParser extends DefaultHandler2 {
 					taskInfo.deadline(deadline);
 				}
 
-				if (priority > 0) {
+				if (priority > 0 || priority == TaskInfo.NO_PRIORITY) {
 					taskInfo.priority(priority);
+				}
+
+				if (releaseTime > 0) {
+					taskInfo.releaseTime(releaseTime);
 				}
 			}
 		});
@@ -129,6 +134,9 @@ public class TaskConfigParser extends DefaultHandler2 {
 			public void handle(String uri, String localName, String qName) {
 				TaskInfo ti = taskInfo.build();
 				taskInfo = null;
+				
+				Log.d(TAG, "parsed task: {0}", ti);
+				
 				config.taskInfo(ti);				
 			}
 		});

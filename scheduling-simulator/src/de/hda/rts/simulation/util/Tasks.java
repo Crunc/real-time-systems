@@ -12,24 +12,49 @@ public final class Tasks {
 		// should not be instantiated
 	}
 	
+	public static final Comparator<Task> NAME_COMPARATOR = new NullSafeComparator<Task>() {
+		@Override
+		public int safeCompare(Task left, Task right) {
+			return left.getName().compareTo(right.getName());
+		}
+	};
+	
 	public static final Comparator<Task> PERIOD_COMPARATOR = new NullSafeComparator<Task>() {
 		@Override
 		public int safeCompare(Task left, Task right) {
-			return left.getInfo().getPeriod() - right.getInfo().getPeriod();
+			int result = left.getPeriod() - right.getPeriod();
+			
+			if (result == 0) {
+				return -1;
+			}
+			
+			return result;
 		}
 	};
 	
 	public static final Comparator<Task> DEADLINE_COMPARATOR = new NullSafeComparator<Task>() {
 		@Override
 		public int safeCompare(Task left, Task right) {
-			return left.getInfo().getDeadline() - right.getInfo().getDeadline();
+			int result = left.getDeadline() - right.getDeadline();
+			
+			if (result == 0) {
+				return -1;
+			}
+			
+			return result;
 		}
 	};
 	
-	public static final Comparator<Task> NAME_COMPARATOR = new NullSafeComparator<Task>() {
+	public static final Comparator<Task> PRIORITY_COMPARATOR = new NullSafeComparator<Task>() {
 		@Override
 		public int safeCompare(Task left, Task right) {
-			return left.getInfo().getName().compareTo(right.getInfo().getName());
+			int result = right.getPriority() - left.getPriority();
+			
+			if (result == 0) {
+				return -1;
+			}
+			
+			return result;
 		}
 	};
 	
