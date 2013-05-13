@@ -1,8 +1,11 @@
 package de.hda.rts.car;
 
+import java.awt.Point;
+
 public abstract class Task extends Thread {
 
 	protected static Object mutex = new Object();
+	protected static Point position = new Point();
 	
 	protected long startTime = 0L;
 	

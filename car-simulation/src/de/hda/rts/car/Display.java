@@ -13,5 +13,7 @@ public class Display extends Task {
 	@Override
 	protected void execute() {
 		Log.d(TAG, "T={0}, S={1}", period, startTime);
+		
+		position.x = 300;
 	}
 }
