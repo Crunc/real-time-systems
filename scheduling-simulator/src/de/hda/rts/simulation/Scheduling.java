@@ -156,6 +156,8 @@ public abstract class Scheduling {
 		blockedTasks.clear();
 
 		for (Task task : tasks) {
+			task.checkRelease(stepCount);
+			
 			if (computingTask != null) {
 				if (task == computingTask) {
 					Resource resource = getResource(task.getNextExecutionStep());

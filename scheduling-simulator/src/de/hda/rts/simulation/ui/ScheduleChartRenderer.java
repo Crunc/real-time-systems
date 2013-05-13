@@ -70,13 +70,13 @@ public class ScheduleChartRenderer implements TableCellRenderer {
 			}
 			break;
 			
-		case BLOCKED:
-			color = blockedColor;
-			break;
+//		case BLOCKED:
+//			color = blockedColor;
+//			break;
 		
-		case NOT_RELEASED:
-			color = notReleasedColor;
-			break;
+//		case NOT_RELEASED:
+//			color = notReleasedColor;
+//			break;
 			
 		default:
 			color = defaultColor;

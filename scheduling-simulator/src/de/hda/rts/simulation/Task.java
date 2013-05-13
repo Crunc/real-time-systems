@@ -84,7 +84,7 @@ public class Task {
 	}
 	
 	public void update(int step) {
-		released = step > getReleaseTime();
+		released = step >= getReleaseTime();
 		if (step % info.getPeriod() == 0) {
 			computed = 0;
 		}
@@ -155,5 +155,10 @@ public class Task {
 			
 			return task;
 		}
+	}
+
+	public boolean checkRelease(int stepCount) {
+		released = stepCount >= getReleaseTime();
+		return released;
 	}
 }
