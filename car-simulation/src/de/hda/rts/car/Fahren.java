@@ -2,19 +2,18 @@ package de.hda.rts.car;
 
 public class Fahren extends Task
 {
-	private int V = 0;
-	private int d = 0;
-	public Fahren(long t, int V, int d)
+	public Fahren(long t, int V, int dx,int dy)
 	{
 		super(t);
-		this.V = V;
-		this.d = d;
+		Task.car.V = V;
+		Task.car.Dx = dx;
+		Task.car.Dy = dy;
 	}
 
 	@Override
 	protected void execute()
 	{
-		double realV = (this.period * V) / 1000.0;
+		double realV = (this.period * Task.car.V) / 1000.0;
 	}
 
 }

@@ -2,7 +2,7 @@ package de.hda.rts.car;
 
 public abstract class Task extends Thread {
 
-	protected static Car position = new Car();
+	protected static Car car = new Car();
 	
 	protected long startTime = 0L;
 	
@@ -69,7 +69,7 @@ public abstract class Task extends Thread {
 		
 		while (true) {
 			
-			synchronized(position) {
+			synchronized(car) {
 				execute();
 			}
 			
