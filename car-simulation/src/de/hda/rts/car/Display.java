@@ -12,6 +12,6 @@ public class Display extends Task {
 
 	@Override
 	protected void execute() {
-		Log.d(TAG, "T={0}, S={1}", period, startTime);
+		Log.d(TAG, "pos: {0}, {1}", car.x, car.y);
 	}
 }
