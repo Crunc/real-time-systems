@@ -19,14 +19,17 @@ public class Fahren extends Task
 		double length = Math.sqrt(car.Dx*car.Dx+ car.Dy*car.Dy);		
 		double realV = (this.period * length) / 1000.0;
 		
-		car.x=+ car.Dx*realV;
-		car.y=+ car.Dy*realV;
+		/*car.x=+ car.Dx*realV;
+		car.y=+ car.Dy*realV;*/
 				
-		double entf = street.distance(car.x, car.y);
-		if(entf < 0)
+		double angle = Math.toDegrees(street.angle(car.x, car.y));
+		if(angle > 180)
 		{
-			
+			//car.Dx
 		}
+		
+		car.x += car.Dx;
+		car.y += car.Dy;
 	}
 
 }

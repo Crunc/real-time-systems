@@ -7,7 +7,7 @@ public class Main {
 		d.start();
 		
 		Fahren f = new Fahren(100, 45, 9, 9);
-		
+		f.start();
 		try {
 			d.join();
 		} catch (InterruptedException e) {
