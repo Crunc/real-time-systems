@@ -3,6 +3,15 @@ package de.hda.rts.car;
 public abstract class Task extends Thread {
 
 	protected static Car car = new Car();
+	protected static Street street = new Street() {
+		{
+			ax = 5.0;
+			ay = 5.0;
+			
+			bx = 1.0;
+			by = 0.0;
+		}
+	};
 	
 	protected long startTime = 0L;
 	
