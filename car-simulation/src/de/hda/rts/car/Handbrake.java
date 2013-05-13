@@ -29,6 +29,7 @@ public class Handbrake extends Task {
 	}
 
 	private boolean isToFarAway() {
-		return street.distance(car.x, car.y) > 5;
+		double distance = street.distance(car.x, car.y);
+		return distance > 5;
 	}
 }
