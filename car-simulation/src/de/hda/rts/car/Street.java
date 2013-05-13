@@ -12,4 +12,8 @@ public class Street {
 	    double normalLength = Math.sqrt((bx-ax)*(bx-ax)+(by-ay)*(by-ay));
 	    return Math.abs((x-ax)*(by-ay)-(y-ay)*(bx-ax))/normalLength;
 	}
+	
+	public double angle(double x, double y) {
+		return Math.acos(x * bx + y * by);
+	}
 }

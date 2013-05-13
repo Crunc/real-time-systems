@@ -1,6 +1,10 @@
 package de.hda.rts.car;
 
+import de.hda.rts.simulation.util.Log;
+
 public class Handbrake extends Task {
+
+	private static final String TAG = Handbrake.class.getSimpleName();
 
 	public Handbrake(long t) {
 		super(t);
@@ -9,6 +13,8 @@ public class Handbrake extends Task {
 	@Override
 	protected void execute() {
 		if (isToFarAway()) {
+			Log.d(TAG, "BREAK!");
+			
 			car.Dx /= 2;
 			car.Dy /= 2;
 			
@@ -23,6 +29,6 @@ public class Handbrake extends Task {
 	}
 
 	private boolean isToFarAway() {
-		return false;
+		return street.distance(car.x, car.y) > 5;
 	}
 }
