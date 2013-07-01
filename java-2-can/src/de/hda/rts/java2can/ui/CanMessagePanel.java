@@ -3,7 +3,6 @@ package de.hda.rts.java2can.ui;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -14,16 +13,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import de.hda.rts.java2can.util.Hex;
-
 public class CanMessagePanel extends JPanel {
 
 	/**
 	 * Implements {@link Serializable}
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	private static final PrintStream out = System.out;
 	
 	private JLabel canIdLabel;
 
@@ -66,10 +61,19 @@ public class CanMessagePanel extends JPanel {
 	
 	private void onSendButtonClicked(ActionEvent e) {
 		int id = readCanIdField();
-		byte[] data = readCanDataField();
+		byte[] input = readCanDataField();
+		byte[] data = new byte[8];
+		
+		if (input.length >= data.length) {
+			System.arraycopy(input, 0, data, 0, data.length);
+		}
+		else {
+			Arrays.fill(data, (byte) 0x00);
+			System.arraycopy(input, 0, data, 0, input.length);
+		}
 
 		if (onSendClickedHandler != null) {
-			onSendClickedHandler.onSendClicked(id, data);
+			onSendClickedHandler.onSendClicked(id, input);
 		}
 	}
 
@@ -85,28 +89,6 @@ public class CanMessagePanel extends JPanel {
 	private byte[] readCanDataField() {
 		return canDataField.getData();
     }
-	
-	private byte[] readInput(String input, int maxLen) {
-		if (input == null || input.length() == 0) {
-			return new byte[0];
-		}
-		
-		int len = Math.min(maxLen, input.length());
-		
-		char[] buf = null;
-		
-		if (len % 2 == 0) {
-			buf = new char[len];
-			input.getChars(0, Math.min(buf.length, input.length()), buf, 0);
-		}
-		else {
-			buf = new char[1 + len];
-			buf[0] = '0';
-			input.getChars(0, Math.min(buf.length - 1, input.length()), buf, 1);
-		}
-
-		return Hex.decodeHex(buf);
-	}
 
 	private JLabel getCanIdLabel() {
 		if (canIdLabel == null) {

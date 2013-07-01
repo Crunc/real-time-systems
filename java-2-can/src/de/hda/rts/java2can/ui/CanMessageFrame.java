@@ -16,7 +16,6 @@ public class CanMessageFrame extends JFrame {
 	 */
     private static final long serialVersionUID = -6252586763588571222L;
     
-    private static final PrintStream out = System.out;
     private static final PrintStream err = System.err;
     
     private static final String TITLE = "Send a CAN Message";
@@ -26,6 +25,8 @@ public class CanMessageFrame extends JFrame {
 	private JPanel layoutPanel;
 	
 	private ComPortSettingsPanel comPortSettingsPanel;
+	
+	private CanConsole canConsole;
 	
 	private CanMessagePanel canMessagePanel;
 
@@ -50,19 +51,35 @@ public class CanMessageFrame extends JFrame {
 			layoutPanel.setLayout(new BorderLayout());
 			
 			layoutPanel.add(getComPortSettingsPanel(), BorderLayout.NORTH);
+			layoutPanel.add(getCanConsole(), BorderLayout.CENTER);
 			layoutPanel.add(getMessagePanel(), BorderLayout.SOUTH);
 		}
 		
 		return layoutPanel;
 	}
-	
+
 	private ComPortSettingsPanel getComPortSettingsPanel() {
 	    if (comPortSettingsPanel == null) {
 	    	comPortSettingsPanel = new ComPortSettingsPanel();
+	    	comPortSettingsPanel.setComPortSelectedListener(new ComPortSettingsPanel.ComPortSelectedListener() {
+				
+				@Override
+				public void onPortSelected(String portName) {
+					canConsole.reset(portName);
+				}
+			});
 	    }
 	    
 	    return comPortSettingsPanel;
     }
+	
+	private CanConsole getCanConsole() {
+		if (canConsole == null) {
+			canConsole = new CanConsole();
+		}
+		
+		return canConsole;
+	}
 
 	private CanMessagePanel getMessagePanel() {
 		if (canMessagePanel == null) {
